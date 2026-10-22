@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Loop Wallpaper</string>
+    <string name="wallpaper_description">Plays your seamless video loop.</string>
+    <string name="intro">Pick a video. The app finds the spot where the end looks most like the start, smooths the seam, and sets it as your live wallpaper.</string>
+    <string name="choose_video">Choose video</string>
+    <string name="create_loop">Create loop</string>
+    <string name="set_wallpaper">Set as wallpaper</string>
+    <string name="save_to_gallery">Save to gallery</string>
+    <string name="settings_title">Loop settings</string>
+    <string name="preview_title">Preview</string>
+    <string name="end_of_loop">End of loop</string>
+    <string name="start_of_loop">Start of loop</string>
+</resources>
