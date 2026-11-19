@@ -63,6 +63,8 @@ class MainActivity : AppCompatActivity() {
         b.createButton.setOnClickListener { createLoop() }
         b.setWallpaperButton.setOnClickListener { setWallpaper() }
         b.saveButton.setOnClickListener { saveToGallery() }
+        b.updateButton.setOnClickListener { checkForUpdate() }
+        b.versionText.text = "Build ${Updater.installedBuild(this)}"
 
         b.rangeSlider.addOnChangeListener(RangeSlider.OnChangeListener { _, _, _ -> onRangeChanged() })
         for (slider in listOf(b.lengthSlider, b.flexSlider, b.fadeSlider)) {
@@ -392,6 +394,35 @@ class MainActivity : AppCompatActivity() {
         if (e is CancellationException) return
         val message = if (e is LoopException) e.message else "Something went wrong: ${e.message ?: e.javaClass.simpleName}"
         toast(message ?: "Something went wrong.")
+    }
+
+    // ---- Updates ----
+
+    private fun checkForUpdate() {
+        b.updateButton.isEnabled = false
+        b.updateButton.text = "Checking…"
+        lifecycleScope.launch {
+            try {
+                val release = Updater.findUpdate(this@MainActivity)
+                if (release == null) {
+                    toast("You're on the latest build.")
+                } else if (Updater.ensureInstallAllowed(this@MainActivity)) {
+                    val apk = Updater.download(this@MainActivity, release) { f ->
+                        runOnUiThread { b.updateButton.text = "Downloading build ${release.build}… ${(f * 100).toInt()}%" }
+                    }
+                    Updater.install(this@MainActivity, apk)
+                } else {
+                    toast("Allow installs from Loop Wallpaper, then tap Check for updates again.")
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                toast("Update failed: ${e.message ?: e.javaClass.simpleName}")
+            } finally {
+                b.updateButton.isEnabled = true
+                b.updateButton.text = getString(R.string.check_updates)
+            }
+        }
     }
 
     private fun toast(message: String) = Toast.makeText(this, message, Toast.LENGTH_LONG).show()

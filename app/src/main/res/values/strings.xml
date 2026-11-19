@@ -10,4 +10,5 @@
     <string name="preview_title">Preview</string>
     <string name="end_of_loop">End of loop</string>
     <string name="start_of_loop">Start of loop</string>
+    <string name="check_updates">Check for updates</string>
 </resources>
