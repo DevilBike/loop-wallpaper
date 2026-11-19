@@ -7,7 +7,9 @@ plugins {
 
 // CI provides a stable signing key through repository secrets so new builds install over old ones.
 // Without it the build falls back to the default debug key.
+// Falls back to the personal key committed in keystore/.
 val releaseKeystore = System.getenv("SIGNING_KEYSTORE_PATH")?.let { file(it) }?.takeIf { it.exists() }
+val personalKeystore = rootProject.file("keystore/loopwallpaper.jks")
 
 android {
     namespace = "com.devilbike.loopwallpaper"
@@ -22,12 +24,17 @@ android {
     }
 
     signingConfigs {
-        if (releaseKeystore != null) {
-            create("release") {
+        create("release") {
+            if (releaseKeystore != null) {
                 storeFile = releaseKeystore
                 storePassword = System.getenv("SIGNING_STORE_PASSWORD")
                 keyAlias = System.getenv("SIGNING_KEY_ALIAS")
                 keyPassword = System.getenv("SIGNING_KEY_PASSWORD")
+            } else {
+                storeFile = personalKeystore
+                storePassword = "loopwallpaper-personal"
+                keyAlias = "loopwallpaper"
+                keyPassword = "loopwallpaper-personal"
             }
         }
     }
@@ -35,11 +42,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            signingConfig = if (releaseKeystore != null) {
-                signingConfigs.getByName("release")
-            } else {
-                signingConfigs.getByName("debug")
-            }
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
